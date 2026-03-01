@@ -1,4 +1,4 @@
-# Poorn SDK
+# Balaji SDK
 
 Production-oriented Python SDK for [The One API](https://the-one-api.dev/) focused on movie and quote endpoints.
 
