@@ -52,43 +52,6 @@ quotes = client.movies.quotes(
 print(len(quotes["docs"]))
 ```
 
-## Resiliency (Retry + Jitter)
-
-The client includes adaptive retry for transient failures:
-- Retries on network errors (`Timeout`, `ConnectionError`)
-- Retries on transient HTTP statuses: `408, 425, 429, 500, 502, 503, 504`
-- Uses `Retry-After` header when returned by API (for example on `429`)
-- Otherwise uses exponential backoff with jitter
-
-Configuration options on `LOTRClient(...)`:
-- `max_retries` (default `3`)
-- `backoff_base_seconds` (default `0.5`)
-- `max_backoff_seconds` (default `8.0`)
-- `jitter_ratio` (default `0.2`)
-
-## Observability Hooks
-
-You can pass `event_hook` to receive request lifecycle events.
-
-```python
-from pprint import pformat
-from lotr_sdk import LOTRClient
-
-def log_event(event: dict) -> None:
-    print(pformat(event))
-
-client = LOTRClient(api_key="token", event_hook=log_event)
-client.movies.list(limit=1)
-```
-
-Event types:
-- `request_attempt`
-- `request_retry`
-- `request_exception`
-- `request_complete`
-
-Common event fields include `path`, `url`, `attempt`, `status_code`, `elapsed_ms`, and `request_id` (if sent by API).
-
 ## Filtering
 
 Two options are supported.
@@ -109,7 +72,7 @@ client.quotes.list(
 2. Raw dictionary filters:
 
 ```python
-client.movies.list(filters={"runtimeInMinutes>": 120, "name": "The Two Towers"})
+client.movies.list(filters={"name": "The Fellowship of the Ring"})
 ```
 
 Supported operations in fluent API:
@@ -151,14 +114,3 @@ PYTHONPATH=src python demo/demo.py
 ```
 
 If you run without network access, demo requests will fail but this does not affect test execution.
-
-## Examples
-
-Run from project root:
-
-```bash
-export LOTR_API_KEY="your-token"
-PYTHONPATH=src python examples/basic_usage.py
-PYTHONPATH=src python examples/filtering_examples.py
-PYTHONPATH=src python examples/observability_retry_demo.py
-```

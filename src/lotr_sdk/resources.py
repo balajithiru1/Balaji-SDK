@@ -34,6 +34,9 @@ def _merge_params(
     if isinstance(filters, dict):
         for key, value in filters.items():
             key_str = str(key)
+            if key_str in {"sort", "limit", "page", "offset"}:
+                params[key_str] = str(value)
+                continue
             if any(op in key_str for op in ("!=", ">=", "<=", "=", ">", "<")):
                 filter_fragments.append(f"{key_str}{value}")
             else:

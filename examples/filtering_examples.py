@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 
 from lotr_sdk import LOTRClient, fields
+from lotr_sdk.exceptions import APIRequestError
 
 
 def main() -> int:
@@ -24,8 +25,13 @@ def main() -> int:
     )
     print(f"Fluent filter quotes: {len(fluent['docs'])}")
 
-    raw = client.movies.list(filters={"runtimeInMinutes>": 120, "sort": "-runtimeInMinutes"})
-    print(f"Raw filter movies: {len(raw['docs'])}")
+    try:
+        first_movie = client.movies.list(limit=1)
+        movie_name = first_movie["docs"][0].get("name", "The Lord of the Rings Series")
+        raw = client.movies.list(filters={"name": movie_name})
+        print(f"Raw filter movies: {len(raw['docs'])}")
+    except (APIRequestError, IndexError, KeyError):
+        print("Raw filter failed; skipping.")
 
     return 0
 
